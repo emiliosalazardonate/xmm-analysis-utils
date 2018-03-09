@@ -8,10 +8,11 @@ from es.ucm.fis.tfm.regionfiles import RegionFileManager
 
 
 class FitsFileManager:
-    def __init__(self, fileName, regionFile):
+    def __init__(self, fileName, regionFile, source):
         self.hdulist = pyfits.open(fileName)
         self.regionFile = regionFile
         self.regionFile.createHeader()
+        self.source = source
 
     def read(self):
         tabdata = self.hdulist[1].data
@@ -27,8 +28,9 @@ class FitsFileManager:
         # J1839.5-0705;279.876;-7.084;0.084;
 
 
-        coordinatesFermi = SkyCoord(279.363, -7.296, unit=(u.degree, u.degree))
-        errorFermi = 0.036
+        #coordinatesFermi = SkyCoord(279.363, -7.296, unit=(u.degree, u.degree))
+        coordinatesFermi = self.source.coord
+        errorFermi = self.source.error
 
         self.regionFile.addLine('circle(279.363,-7.296,%s") # text={J1837.4-0717}\n' % (errorFermi * 3600))
 

@@ -6,33 +6,32 @@ import subprocess
 
 
 class ImageManager:
-    def __init__(self, analysisdirectory, instrument,ratecut = 1):
+    def __init__(self, analysisdirectory, instrument, source, ratecut = 1):
         self.instrument = instrument
         self.analysisdirectory = analysisdirectory
         self.ratecut = ratecut
+        self.source = source
 
         print ("%s  ==== " %analysisdirectory)
     def createImage(self) :
-        analysisdirectory = self.analysisdirectory
-        instrument = self.instrument
-        os.environ['DATRED'] = '%s/%s' % (analysisdirectory, instrument)
+        os.environ['DATRED'] = '%s/%s' % (self.analysisdirectory, self.instrument)
         os.environ['PATH'] = '%s:/Applications/ds9.darwinelcapitan.7.5/' % os.environ['PATH']
-        if instrument == 'pn':
-            self.createPNImages(analysisdirectory, instrument)
-            self.detectSources(analysisdirectory, instrument)
-            self.createRegionFile(analysisdirectory, instrument)
+        if  self.instrument == 'pn':
+            self.createPNImages(self.analysisdirectory, self.instrument)
+            self.detectSources(self.analysisdirectory, self.instrument)
+            self.createRegionFile(self.analysisdirectory, self.instrument)
 
             print ("------------------")
             scrdisplaycommand = "srcdisplay boxlistset=pn_emllist.fits imageset=pn_image_full.fits "
             print ("/////////////////")
             print (scrdisplaycommand)
-            p = subprocess.Popen(scrdisplaycommand, shell=True, cwd='%s/%s' % (analysisdirectory, instrument))
+            p = subprocess.Popen(scrdisplaycommand, shell=True, cwd='%s/%s' % (self.analysisdirectory, self.instrument))
             p.wait()
             print ("------------------")
 
     def createRegionFile(self,analysisdirectory, instrument):
         regionFile = RegionFileManager('%s/%s/automatic-region.reg' % (analysisdirectory, instrument))
-        fitsManager = FitsFileManager('%s/%s/%s_emllist.fits' % (analysisdirectory, instrument, instrument), regionFile)
+        fitsManager = FitsFileManager('%s/%s/%s_emllist.fits' % (analysisdirectory, instrument, instrument), regionFile, self.source)
         fitsManager.read()
 
 
